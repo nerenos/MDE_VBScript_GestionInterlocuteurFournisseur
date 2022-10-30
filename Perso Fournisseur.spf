@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<ASXMODULE VERSION="1.0" TITLE="Perso" CONTEXT="TfmFournisseur"><LOCAL><SCRIPT>Sub FonctionInterloc
+    If Auth Then
+        Exit Sub
+    End If
+    IdInterloc = InputBox("Identifiant interloc :", "0000")
+    If IdInterloc &lt;&gt; "0000" Then
+        rSql="SELECT * FROM FONCTIONINTERLOC WHERE ID='" &amp; IdInterloc &amp; "'"
+        set sRcs = CreateRecordset(rSql &amp; "/* SELECT : mention obligatoire */")
+        sSql="SELECT NOM, EMAIL FROM COMM_TIERSINTERLOC WHERE IDENTIFIANT='" &amp; IdInterloc &amp; "'"
+        set MyRcs = CreateRecordset(sSql &amp; "/* SELECT : mention obligatoire */")
+        EmailInterloc = MyRcs.GetValue(2)
+        NomInterloc = MyRcs.GetValue(1)
+        If sRcs.RecordCount&gt;0 Then
+                DP = sRcs.GetValue(2)
+                CDE = sRcs.GetValue(3)
+                FACT = sRcs.GetValue(4)
+                SAV = sRcs.GetValue(5)
+                COMM = sRcs.GetValue(6)
+                Attribut = ""
+                If DP Then Attribut = Attribut &amp; "1" Else Attribut = Attribut &amp; "0" End If
+                If CDE Then Attribut = Attribut &amp; "1" Else Attribut = Attribut &amp; "0" End If
+                If FACT Then Attribut = Attribut &amp; "1" Else Attribut = Attribut &amp; "0" End If
+                If SAV Then Attribut = Attribut &amp; "1" Else Attribut = Attribut &amp; "0" End If
+                If COMM Then Attribut = Attribut &amp; "1" Else Attribut = Attribut &amp; "0" End If
+                Attri = InputBox(NomInterloc &amp; "  " &amp; EmailInterloc &amp; vbCrLf &amp; "Attributs = DP CDE FACT SAV COMM" &amp; vbCrLf &amp; Attribut,"")
+                If Len(Attri) = 5 Then
+                    uSql="UPDATE FONCTIONINTERLOC SET DP = '" &amp; CutString(Attri,0) &amp; "' ,CDE = '" &amp; CutString(Attri,1) &amp; "' ,FACT = '" &amp; CutString(Attri,2) &amp; "' ,SAV = '" &amp; CutString(Attri,3) &amp; "' ,COMM = '" &amp; CutString(Attri,4) &amp; "' WHERE ID='" &amp;  IdInterloc &amp; "'"
+                    set uRcs = CreateRecordset(uSql &amp; "/* SELECT : mention obligatoire */")
+                    set uRcs = Nothing
+                End If
+        Else
+                Attri = InputBox(NomInterloc &amp; "  " &amp; EmailInterloc &amp; vbCrLf &amp; "Attributs = DP CDE FACT SAV COMM" &amp; vbCrLf &amp; "00000","")
+                If Len(Attri) = 5 Then
+                    uSql="INSERT INTO FONCTIONINTERLOC (ID, DP, CDE, FACT, SAV, COMM) VALUES ('" &amp; IdInterloc &amp; "', '" &amp; CutString(Attri,0) &amp; "', '" &amp; CutString(Attri,1) &amp; "', '" &amp; CutString(Attri,2) &amp; "', '" &amp; CutString(Attri,3) &amp; "', '" &amp; CutString(Attri,4) &amp; "')"
+                    set uRcs = CreateRecordset(uSql &amp; "/* SELECT : mention obligatoire */")
+                    set uRcs = Nothing
+                End If
+        End If
+
+    End If
+
+
+End Sub
+
+Function CutString(Chaine, n)
+    L = Len(Chaine)
+    CutString = Left(Right(Chaine,L-n),1)
+End Function
+
+Function Auth()
+	If User()="JZU" Or User()="VLA" Or User()="LCH" Or User()="CLE" Then Auth = False Else Auth = True End If
+End Function
+
+Function User()
+	If UserName &lt;&gt; "Admin" Then
+		TabName = Split(UserName," ")
+		sSql="select CODEGESTION from COMM_EMPLOYE where NOM='" &amp; TabName(1) &amp; "' AND PRENOM='" &amp; TabName(0) &amp; "'"
+		Set Rcs = CreateRecordSet(sSql)
+		If Rcs.RecordCount &lt;&gt; 0 Then Id = Rcs.GetValue("CODEGESTION") End If
+User = Id
+	Else
+User = "Admin"
+	End If
+End Function</SCRIPT><FONCTIONS><FONCTION NAME="FonctionInterloc"/><FONCTION NAME="Auth"/><FONCTION NAME="User"/></FONCTIONS></LOCAL><INTERFACE><ITEM TYPE="icon" FONCTION="FonctionInterloc"><ICON>AAABAAEAEBAEAAAAAAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAACAAAAAgIAAgAAAAIAAgACAgAAAgICAAMDAwAAAAP8AAP8AAAD//wD/AAAA/wD/AP//AAD///8AAAAAAAAwAAAAAAAAswMAAAAO5ECAsDAADOzMzAgDADAOwAAAELC7AwAIMBGQO7OwAINwAAA4MLAACDiAADiLAwAIiIA4AzAwAIiPiAgAAAAAiIgAODcAAAAAiICAAAAAAAAIgDgAAAAAAAAAgwAAAAAAAAAAAAAAAAAAAAAAAAD/HwAA/g8AAMAHAAAAAQAAAAAAAABAAACAwAAAwAAAAIABAAAAHwAAAA8AAAAfAAAAHwAAAA8AAIAPAADgHwAA</ICON></ITEM></INTERFACE><SCRIPTS><SCRIPT NAME="Ouverture">SetValue "txtRef","Client N°"</SCRIPT><SCRIPT NAME="Fermeture"/><SCRIPT NAME="Validation"/><SCRIPT NAME="Après validation"/></SCRIPTS></ASXMODULE>
